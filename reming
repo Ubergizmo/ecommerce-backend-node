@@ -1,0 +1,34 @@
+    Authentification :
+        /api/auth/register : Permet à un utilisateur de s'inscrire en fournissant des informations telles que nom, email et mot de passe.
+        /api/auth/login : Permet à un utilisateur de se connecter en fournissant son email et mot de passe, et renvoie un token JWT pour l'authentification ultérieure.
+        /api/auth/logout : Permet à un utilisateur connecté de se déconnecter.
+
+    Produits :
+        /api/products : GET pour récupérer tous les produits.
+        /api/products/:id : GET pour récupérer un produit spécifique par son ID.
+        /api/products : POST pour ajouter un nouveau produit.
+        /api/products/:id : PUT pour mettre à jour un produit existant.
+        /api/products/:id : DELETE pour supprimer un produit existant.
+
+    Panier :
+        /api/cart : GET pour récupérer le contenu du panier de l'utilisateur connecté.
+        /api/cart/add : POST pour ajouter un produit au panier de l'utilisateur connecté.
+        /api/cart/remove/:productId : POST pour supprimer un produit du panier de l'utilisateur connecté.
+
+    Commandes :
+        /api/orders : GET pour récupérer toutes les commandes de l'utilisateur connecté.
+        /api/orders/:id : GET pour récupérer une commande spécifique par son ID.
+        /api/orders : POST pour passer une nouvelle commande.
+
+    Paiement :
+        /api/payment/process : POST pour traiter le paiement d'une commande.
+        /api/payment/cancel : POST pour annuler un paiement en cours.
+
+    Utilisateurs :
+        /api/users/:id : GET pour récupérer les informations d'un utilisateur par son ID.
+        /api/users/:id : PUT pour mettre à jour les informations d'un utilisateur existant.
+        /api/users/:id : DELETE pour supprimer un utilisateur existant (peut nécessiter des autorisations spéciales).
+
+    Filtrage et Recherche :
+        /api/products?category=xxx : GET pour récupérer tous les produits d'une catégorie spécifique.
+        /api/products/search?query=xxx : GET pour rechercher des produits en fonction d'un terme de recherche.
