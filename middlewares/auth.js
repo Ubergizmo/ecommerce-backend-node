@@ -1,12 +1,13 @@
+//auth.js
 const jwt = require('jsonwebtoken');
 
 exports.auth = async (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-        const userId = decodedToken.userId;
+        const userID = decodedToken.userID;
         req.auth = {
-            userId: userId
+            userID: userID
         };
         next();
     } catch (error) {

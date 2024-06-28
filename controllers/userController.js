@@ -1,3 +1,4 @@
+//userController.js
 const userSchema = require('../models/userSchema');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -14,11 +15,15 @@ exports.getUser = async (req, res, next) => {
 };
 exports.editUser = async (req, res, next) => {
     const updatedUser = new userSchema({
+        _id: req.body._id,
         username: req.params.username,
         password: req.params.password
     })
     try {
         const response = await userSchema.findByIdAndUpdate(req.params.id, updatedUser);
+        if (!response) {
+            return res.status(404).json({ message: 'User does not exist' });
+        }
         res.status(201).json('User sucefully updated');
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -45,7 +50,7 @@ exports.login = async (req, res, next) => {
         if (!passwordMatch) {
             return res.status(401).json({ auth: false, token: null, message: 'Wrong password' });
         }
-        const token = jwt.sign({ userID: user._id }, 'RANDOM_TOKEN_SECRET', { expiresIn: '72h' });
+        const token = jwt.sign({ userID: response._id }, 'RANDOM_TOKEN_SECRET', { expiresIn: '72h' });
         res.status(201).json({ message: "User connected", userID: response._id, token: token });
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -62,5 +67,15 @@ exports.register = async (req, res, next) => {
         res.status(201).json({ message: "User created" });
     } catch (error) {
         res.status(400).json({ error: error.message });
+    }
+};
+exports.logout = async (req, res, next) => {
+    try {
+        if (req.refreshToken) {
+            await refreshTokenSchema.deleteMany({ token: req.refreshToken }).exec();
+        }
+        res.status(200).json({ message: "User deconnected" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to logout." });
     }
 };

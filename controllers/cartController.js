@@ -1,8 +1,8 @@
 const cartSchema = require('../models/cartSchema');
-exports.allCart = async (req, res, next) => {
+exports.getCart = async (req, res, next) => {
     try {
-        const response = await cartSchema.findOne({ userId: req.query.userId });
-        if (!response || response.products.length === 0) {
+        const response = await cartSchema.find({ userId: req.params.userId, _id: req.params.id });
+        if (!response) {
             return res.status(404).json({ message: "Cart is empty" });
         }
         res.status(200).json(response);
@@ -10,39 +10,45 @@ exports.allCart = async (req, res, next) => {
         res.status(400).json({ error: error.message });
     }
 };
-exports.addToCart = async (req, res, next) => {
+exports.addCart = async (req, res, next) => {
     const myItem = new cartSchema({
-        userId: req.params.userId,
+        userId: req.body.userId,
         products: [
-            ...products,
             {
-                productId: req.params.productId,
-                quantity: req.params.quantity
+                productId: req.body.productId,
+                quantity: req.body.quantity
             }
         ]
-    })
+    });
     try {
-        await myItem.findOneAndUpdate();
-        res.status(201).json('');
+        await myItem.save();
+        res.status(201).json({ message: 'Cart created successfully' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
 exports.editCart = async (req, res, next) => {
+    const updatedCart = new cartSchema({
+        _id: req.params.id,
+        ...req.body,
+    });
     try {
-        const deletedProduct = await cartSchema.findByIdAndDelete(req.params.productId);
-        if (!deletedProduct) {
-            return res.status(404).json('Product does not exist in the cart');
+        const response = await cartSchema.findByIdAndUpdate(req.params.id, updatedCart);
+        if (!response) {
+            return res.status(404).json('Cart does not exist ');
         }
-        res.status(201).json('The Product was deleted in the cart');
+        res.status(201).json('The Product was added in the cart');
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
 exports.deleteCart = async (req, res, next) => {
     try {
-        await cartSchema.deleteMany({ userId: req.query.userId });
-        res.status(201).json("Deleted all items in the Cart");
+        const response = await cartSchema.findByIdAndDelete(req.params.id);
+        if (!response) {
+            return res.status(404).json('Cart does not exist');
+        }
+        res.status(201).json('The cart was deleted');
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

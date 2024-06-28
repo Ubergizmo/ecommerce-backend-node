@@ -8,7 +8,7 @@ exports.addProduct = async (req, res, next) => {
     })
     try {
         await myProduct.save();
-        res.status(201).json({ message: 'Product added added' });
+        res.status(201).json({ message: 'Product added' });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -16,9 +16,10 @@ exports.addProduct = async (req, res, next) => {
 exports.allProduct = async (req, res, next) => {
     try {
         const response = await productSchema.find()
-        !response ?
-            res.status(404).json({ message: "No products found" }) :
-            res.status(201).json(response);
+        if (!response) {
+            return res.status(404).json({ message: "No products found" });
+        }
+        res.status(201).json(response);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -26,15 +27,17 @@ exports.allProduct = async (req, res, next) => {
 exports.oneProduct = async (req, res, next) => {
     try {
         const response = await productSchema.findById(req.params.id);
-        !response ?
-            res.status(404).json("Product does not exist") :
-            res.status(201).json(response);
+        if (!response) {
+            return res.status(404).json("Product does not exist");
+        }
+        res.status(201).json(response);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
 exports.editProduct = async (req, res, next) => {
     const myProduct = new productSchema({
+        _id: req.params.id,
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
@@ -64,25 +67,22 @@ exports.deleteProduct = async (req, res, next) => {
 exports.queryCategory = async (req, res, next) => {
     try {
         const response = await productSchema.find({ category: req.params.category });
-        !response ?
-            res.status(404).send(`No products found`) :
-            res.status(201).json(response);
+        if (!response) {
+            return res.status(404).json(`No products found`);
+        }
+        res.status(201).json(response);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
-exports.searchProduct = async (req, res, next) => {
+exports.searchProduct = async (req, res, next) => {//dont work
     try {
-        const { name, price } = req.query;
-        const query = {};
-        if (name) {
-            query.name = { $regex: name, $options: 'i' };
-        }
-        if (price) {
-            query.price = price;
-        }
+        const query = req.query;
         const response = await productSchema.find(query);
-        res.status(200).json(response);
+        if (!response) {
+            return res.status(404).json(`No products found`);
+        }
+        res.status(201).json(response);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
